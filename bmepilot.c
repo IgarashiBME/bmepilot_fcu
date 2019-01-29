@@ -5,7 +5,7 @@
  *
  * @author   Sho Igarashi <igarashi@bme.en.a.u-tokyo.ac.jp>
  * @version  0.1
- * gcc -I c_library_v1/common -o bme_pilot bme_pilot.c
+ * gcc -I c_library_v1/common -o bmepilot bmepilot.c
 **/
 
 /* C standard library */
@@ -107,8 +107,6 @@ int main(int argc, char **argv){
             //                           mav_mode, 3, MAV_STATE_STANDBY);
             mavlink_msg_heartbeat_pack(1, 1, &mavmsg, MAV_TYPE_GROUND_ROVER, MAV_AUTOPILOT_ARDUPILOTMEGA, 
                                        mav_mode, custom_mode, MAV_STATE_ACTIVE);
-            //mavlink_msg_heartbeat_pack(1, 1, &mavmsg, MAV_TYPE_GROUND_ROVER, MAV_AUTOPILOT_ARDUPILOTMEGA, 
-            //                           mav_mode, 0, MAV_STATE_STANDBY);
 
             len = mavlink_msg_to_send_buffer(buf, &mavmsg);
             bytes_sent = sendto(sock, buf, len, 0, (struct sockaddr*)&gcAddr, sizeof(struct sockaddr_in));
@@ -165,8 +163,8 @@ int main(int argc, char **argv){
                 //printf("%02x ", (unsigned char)temp);
                 if (mavlink_parse_char(MAVLINK_COMM_0, buf[i], &mavmsg, &status)){
                     // Packet decode
-                    printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", 
-                           mavmsg.sysid, mavmsg.compid, mavmsg.len, mavmsg.msgid);
+                    //printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", 
+                    //       mavmsg.sysid, mavmsg.compid, mavmsg.len, mavmsg.msgid);
                 }
             }
             if (mavmsg.msgid == 44){
@@ -189,7 +187,10 @@ int main(int argc, char **argv){
                 mavlink_msg_mission_item_int_decode(&mavmsg, &mavmii);
                 float waypoint_x = mavmii.x/10000000.0;
                 float waypoint_y = mavmii.y/10000000.0;
-                printf("%i, %i, %i, %f, %f\n", mavmii.seq, mission_total_seq, mavmii.command,
+                //printf("%i, %i, %i, %f, %f, %f, %f, %f, %f\n", mavmii.seq, mission_total_seq, mavmii.command,
+                //       mavmii.param1, mavmii.param2, mavmii.param3, mavmii.param4, 
+                //       waypoint_x, waypoint_y);
+                printf("%i, %i, %i, %.9f, %.9f\n", mavmii.seq, mission_total_seq, mavmii.command,
                        waypoint_x, waypoint_y);
                     
                 // output waypoint
