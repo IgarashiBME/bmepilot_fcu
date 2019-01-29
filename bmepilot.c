@@ -54,8 +54,8 @@ int main(int argc, char **argv){
     int custom_mode;
     custom_mode = 0;
 
-    int latitude = 35.717736 * 10000000;  // latitude
-    int longitude = 139.759512 * 10000000;  // longitude
+    int latitude = 34.500682 * 10000000;  // latitude
+    int longitude = 133.558131 * 10000000;  // longitude
     int altitude = 10000;  // altitude above elliposid
     int fix_type = 0;
     int satellites = 12; // number of satellites visible. If unknown, set to 255.
