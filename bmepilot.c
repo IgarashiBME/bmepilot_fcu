@@ -54,8 +54,8 @@ int main(int argc, char **argv){
     int custom_mode;
     custom_mode = 0;
 
-    int latitude = 34.500682 * 10000000;  // latitude
-    int longitude = 133.558131 * 10000000;  // longitude
+    int latitude = 34.5001348 * 10000000;  // latitude
+    int longitude = 133.5591136 * 10000000;  // longitude
     int altitude = 10000;  // altitude above elliposid
     int fix_type = 0;
     int satellites = 12; // number of satellites visible. If unknown, set to 255.
@@ -124,7 +124,7 @@ int main(int argc, char **argv){
             bytes_sent = sendto(sock, buf, len, 0, (struct sockaddr*)&gcAddr, sizeof(struct sockaddr_in));
 		
             /* Send attitude */ 
-            mavlink_msg_attitude_pack(1, 200, &mavmsg, microsSinceEpoch(), 1.2, 1.7, 3.14, 0.01, 0.02, 0.03);
+            mavlink_msg_attitude_pack(1, 200, &mavmsg, microsSinceEpoch(), 0, 0.1, 1, 0.01, 0.02, 0.03);
             len = mavlink_msg_to_send_buffer(buf, &mavmsg);
             bytes_sent = sendto(sock, buf, len, 0, (struct sockaddr*)&gcAddr, sizeof(struct sockaddr_in));
 		
