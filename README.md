@@ -1,5 +1,5 @@
 # bmepilot  
-my original Flight Control Unit  
+my original MAVLink Control Unit  
   
 # bulid
 gcc -I c_library_v1/common -o bmepilot bmepilot.c  
