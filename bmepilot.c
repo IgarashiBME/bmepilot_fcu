@@ -160,11 +160,11 @@ int main(int argc, char **argv){
             for (i = 0; i < recsize; ++i){
                 temp = buf[i];
                 /* Packet received */
-                //printf("%02x ", (unsigned char)temp);
+                printf("%02x ", (unsigned char)temp);
                 if (mavlink_parse_char(MAVLINK_COMM_0, buf[i], &mavmsg, &status)){
                     // Packet decode
-                    //printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", 
-                    //       mavmsg.sysid, mavmsg.compid, mavmsg.len, mavmsg.msgid);
+                    printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", 
+                           mavmsg.sysid, mavmsg.compid, mavmsg.len, mavmsg.msgid);
                 }
             }
             if (mavmsg.msgid == 44){

@@ -20,15 +20,21 @@
 /* mavlink library */
 #include "mavlink.h"
 
-#define BUFFER_LENGTH 2041 // minimum buffer size that can be used with qnx (I don't know why)
-#define DEV_NAME "/dev/ttyUSB0"
+#define BUFFER_LENGTH 512 // minimum buffer size that can be used with qnx (I don't know why)
+#define DEV_NAME "/dev/serial/by-id/usb-FTDI_FT231X_USB_UART_DN0128SM-if00-port0"
+//#define DEV_NAME "/dev/serial/by-id/usb-TOCOS_TWE-Lite-USB_AHY1WO3U-if00-port0"
 #define BAUD_RATE B57600
+
+/* interval */
+#define LIGHT_INTERVAL 100000
+#define REQUEST_INTERVAL 10000
 
 void serial_init(int fd){
     struct termios tio;
     memset(&tio, 0, sizeof(tio));
     tio.c_cflag = CS8 | CLOCAL | CREAD;
-    tio.c_cc[VTIME] = 100;
+    tio.c_cc[VTIME] = 0;
+    tio.c_cc[VMIN] = 10;
     // baud rate setting
     cfsetispeed(&tio, BAUD_RATE);
     cfsetospeed(&tio, BAUD_RATE);
@@ -65,6 +71,9 @@ int main(int argc, char **argv){
     unsigned int mission_total_seq = 0;
     unsigned int mission_seq = 0;
     int pre_mission_seq = -1;
+
+    uint64_t pre_request_time;
+    int request_interval = 30000; // 0.03 second
 
     // device open
     fd = open(DEV_NAME, O_RDWR);
@@ -109,20 +118,16 @@ int main(int argc, char **argv){
 
             pre_time = microsSinceEpoch();
         }
-        // Mission Request
-        //if (mission_total_seq > 0 && pre_mission_seq != mission_seq){
-        //    mavlink_msg_mission_request_int_pack(1, 200, &msg, 0, 0, mission_seq);
-        //    len = mavlink_msg_to_send_buffer(buf, &msg);
-        //   bytes_sent = write(fd, buf, len);
-        //    pre_mission_seq = mission_seq;
-        //}
 
-        if (mission_total_seq > 0){
+        /* Mission Request */
+        if (mission_total_seq > 0 && microsSinceEpoch() - pre_request_time > REQUEST_INTERVAL){
+            printf("request\n %i", mission_seq);
             mavlink_msg_mission_request_int_pack(1, 200, &msg, 0, 0, mission_seq);
             len = mavlink_msg_to_send_buffer(buf, &msg);
             bytes_sent = write(fd, buf, len);
-        }
 
+            pre_request_time = microsSinceEpoch();
+        }
 
         // receive section
         len = read(fd, buf, BUFFER_LENGTH);
@@ -131,7 +136,8 @@ int main(int argc, char **argv){
         }
 
         for(i=0; i<len; i++){
-            //printf("%02X", buf[i]);
+            //usleep(1000);
+            printf("%02X", buf[i]);
             if (mavlink_parse_char(MAVLINK_COMM_0, buf[i], &msg, &status)){
                 // Packet decode
                 printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", 
@@ -199,9 +205,6 @@ int main(int argc, char **argv){
                             pre_mission_seq = mavmii.seq;
                             mission_seq = mavmii.seq+1;
                         }
-                        // next mission sequence
-                        //if (mission_seq == mavmii.seq)
-                        //mission_seq = mavmii.seq+1;
  
                         // if mission sequence is end, send mission ack
                         if (mission_seq == mission_total_seq){
@@ -242,7 +245,6 @@ int main(int argc, char **argv){
                 }
             }
         }
-        //usleep(10000);
         // param request received
 
         //printf("\n");
